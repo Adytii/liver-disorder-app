@@ -47,12 +47,24 @@ def check_for_cirrhosis(tb, db, sgpt, sgot, alb, ag_ratio):
     return False
 
 if st.button("Predict Liver Condition"):
-    prediction = model.predict(input_data)[0]
-
-    if prediction == 1:
-        if check_for_cirrhosis(tb, db, sgpt, sgot, alb, ag_ratio):
-            st.warning("⚠️ The model predicts liver disorder — likely **Cirrhosis** based on enzyme levels.")
-        else:
-            st.warning("⚠️ The model predicts liver disorder — enzyme pattern **suggests other liver issue, not cirrhosis**.")
+    if (
+        0.1 <= tb <= 1.2 and
+        0.0 <= db <= 0.3 and
+        45 <= alkphos <= 115 and
+        7 <= sgpt <= 56 and
+        5 <= sgot <= 40 and
+        6.0 <= tp <= 8.3 and
+        3.5 <= alb <= 5.0 and
+        1.0 <= ag_ratio <= 2.5
+    ):
+        st.success("✅ All enzyme levels are within healthy ranges — likely a healthy liver.")
     else:
-        st.success("✅ The model predicts a **healthy liver condition**.")
+        prediction = model.predict(input_data)[0]
+
+        if prediction == 1:
+            if check_for_cirrhosis(tb, db, sgpt, sgot, alb, ag_ratio):
+                st.warning("⚠️ The model predicts liver disorder — likely **Cirrhosis** based on pattern.")
+            else:
+                st.warning("⚠️ The model predicts liver disorder — enzyme pattern **suggests other issue, not cirrhosis**.")
+        else:
+            st.success("✅ The model predicts a **healthy liver condition**.")
